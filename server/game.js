@@ -76,6 +76,10 @@ class Game {
     this.handCards = {}
     this.upsetCards()
   }
+  updateRoom(room){
+    this.room = room
+    this.members = room.members
+  }
   updatePerson (person) {
     this.persons = person
     this.update()

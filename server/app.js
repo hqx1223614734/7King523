@@ -129,8 +129,9 @@ io.on('connection', socket => {
 
     DATA.rooms[roomId].members = members
     if (members.length >= 1 && DATA.rooms[roomId].uid === uid) {
-      DATA.rooms[roomId][uid] = members[0]
+      DATA.rooms[roomId].uid = members[0]
       io.to(DATA.persons[members[0]].socketId).emit('updateOwner')
+      DATA.rooms[roomId].god && DATA.rooms[roomId].god.updateRoom(DATA.rooms[roomId])
     }
     DATA.persons[uid].roomId = ''
     socket.emit('message', {
