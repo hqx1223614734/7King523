@@ -4,19 +4,46 @@
       class="top area"
       :class="{currentPlayer: (members[1] && members[1].uid === currentPlayer) ? true : false}"
     >
-      <div class="name">{{members[1] ? members[1].name : '无'}}</div>
+      <span class="name">{{members[1] ? members[1].name : '无'}}</span>
+      <div class="cards" v-if="members[1]">
+        <div
+          class="card"
+          v-for="(item) in handCards[members[1].uid]"
+          :key="item.id"
+        >
+            <span class="card-label">？</span>
+    </div>
+      </div>
     </div>
     <div
       class="right area"
       :class="{currentPlayer: (members[0] && members[0].uid === currentPlayer) ? true : false}"
     >
-      <div class="name">{{members[0] ? members[0].name : '无'}}</div>
+      <span class="name">{{members[0] ? members[0].name : '无'}}</span>
+      <div class="remainHandCards" v-if="members[0]">
+        <div
+          class="card"
+          v-for="(item) in handCards[members[0].uid]"
+          :key="item.id"
+        >
+            <span class="card-label">？</span>
+    </div>
+      </div>
     </div>
     <div
       class="left area"
       :class="{currentPlayer: (members[2] && members[2].uid === currentPlayer) ? true : false}"
     >
-      <div class="name">{{members[2] ? members[2].name : '无'}}</div>
+      <span class="name">{{members[2] ? members[2].name : '无'}}</span>
+      <div class="remainHandCards" v-if="members[2]">
+        <div
+          class="card"
+          v-for="(item) in handCards[members[2].uid]"
+          :key="item.id"
+        >
+            <span class="card-label">？</span>
+    </div>
+      </div>
     </div>
     <div class="center area">
       <div class="remainCards">
@@ -32,7 +59,7 @@
         >
             <span
               class="card-color"
-              :style="{color: (item.color === '♥' || item.color === '♦') ? 'red' : 'black'}"
+              :style="{color: (item.color === '♥' || item.color === '♦' || item.color === '\u265B') ? 'red' : 'black'}"
             >{{item.color}}</span>&nbsp;
             <span class="card-label">{{item.label}}</span>
         </div>
@@ -74,7 +101,7 @@
         >
             <span
               class="card-color"
-              :style="{color: (item.color === '♥' || item.color === '♦') ? 'red' : 'black'}"
+              :style="{color: (item.color === '♥' || item.color === '♦' || item.color === '\u265B') ? 'red' : 'black'}"
             >{{item.color}}</span>&nbsp;
             <span class="card-label">{{item.label}}</span>
         </div>
@@ -256,9 +283,6 @@ export default {
 }
 .area {
   position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: rgba(20,110,20,.5)
 }
 .top,
@@ -325,8 +349,33 @@ export default {
   color: red;
 }
 .area .name {
+  position: absolute;
+  top:0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
   font-size: 30px;
-  color: yellow;
+  color: rgb(0, 204, 255);
+  width:fit-content;
+  height:fit-content;
+  z-index: 10;
+}
+.area .remainHandCards{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height:100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 9;
+}
+.remainHandCards .card{
+  width: 80%;
+  height: 18%;
 }
 .cards {
   position: absolute;

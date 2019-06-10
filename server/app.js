@@ -60,6 +60,13 @@ io.on('connection', socket => {
       return
     }
     const members = DATA.rooms[roomId].members
+    if (DATA.rooms[roomId].isStart) {
+      socket.emit('message', {
+        type: 'error',
+        msg: '房间已开始游戏'
+      })
+      return
+    }
     if (DATA.persons[uid].roomId !== '') {
       if (DATA.persons[uid].roomId !== roomId) {
         socket.emit('message', {
@@ -89,12 +96,6 @@ io.on('connection', socket => {
     } else if (members.length === 0) {
       DATA.rooms[roomId].uid = uid
       socket.emit('updateOwner')
-    } else if (DATA.rooms[roomId].isStart) {
-      socket.emit('message', {
-        type: 'error',
-        msg: '房间已开始游戏'
-      })
-      return
     }
     socket.join(roomId)
     DATA.rooms[roomId].members.push(uid)

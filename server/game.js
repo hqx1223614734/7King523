@@ -76,7 +76,7 @@ class Game {
     this.handCards = {}
     this.upsetCards()
   }
-  updateRoom(room){
+  updateRoom (room) {
     this.room = room
     this.members = room.members
   }
@@ -104,14 +104,14 @@ class Game {
     })
     card.push({
       id: id++,
-      color: '♥',
+      color: '\u265B',
       label: '大王',
       value: 18,
       king: true
     })
     card.push({
       id: id++,
-      color: '♣',
+      color: '\u265D',
       label: '小王',
       value: 17,
       king: true
@@ -184,10 +184,16 @@ class Game {
     this.broadcastMsg('currentCards', this.currentCards)
   }
   broadcastHandCards () {
+    this.sortHandCards()
     this.broadcastMsg('handCards', this.handCards)
   }
   broadcasRemainCards () {
     this.broadcastMsg('remainCards', this.cards)
+  }
+  sortHandCards () {
+    this.members.forEach(uid => {
+      this.handCards[uid].sort((a, b) => b.value - a.value)
+    })
   }
   fillCards () {
     for (let index = 0; index < this.membersLength; index += 1) {
