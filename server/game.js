@@ -192,7 +192,7 @@ class Game {
   }
   sortHandCards () {
     this.members.forEach(uid => {
-      this.handCards[uid].sort((a, b) => b.value - a.value)
+      this.handCards[uid] && this.handCards[uid].sort((a, b) => b.value - a.value)
     })
   }
   fillCards () {
