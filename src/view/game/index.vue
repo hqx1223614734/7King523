@@ -70,7 +70,7 @@
       :class="{currentPlayer: (userMsg.uid === currentPlayer) ? true : false}"
     >
       <div class="tools">
-        <Tooltip content="开始游戏" placement="top" transfer v-show="canOpen && isOwner">
+        <Tooltip content="开始游戏" placement="top" transfer v-show="gameOver && canOpen && isOwner">
           <Icon type="md-cube" class="tool hoverToRed" @click="handleStartGame" size="20"/>
         </Tooltip>
         <Tooltip
@@ -129,7 +129,7 @@ export default {
       server: null,
       isOwner: false,
       currentPlayer: '',
-      gameOver: false
+      gameOver: true
     }
   },
   created () {},
@@ -167,9 +167,11 @@ export default {
       })
       this.server = server
     },
-    onGameOver () {
-      this.gameOver = true
-      this.$Message.info('游戏结束')
+    onGameOver (status) {
+      this.gameOver = status
+      if (status) {
+        this.$Message.info('游戏结束')
+      }
     },
     onRemainCards (cards) {
       this.remainLength = cards.length

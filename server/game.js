@@ -65,6 +65,7 @@ class Game {
     this.room = room
     this.persons = persons
     this.io = io
+    this.gameStatus = true
   }
   init () {
     this.currentPlayer = this.room.uid
@@ -129,6 +130,7 @@ class Game {
     this.broadcastHandCards()
   }
   start () {
+    this.changeGameStatus(false)
     this.init()
     this.dealCards()
     this.broadcastCurrentCards()
@@ -139,6 +141,7 @@ class Game {
     this.currentCards = []
     this.currentPlayer = ''
     this.handCards = {}
+    this.changeGameStatus(true)
     this.update()
   }
   playCards (uid, cards) {
@@ -157,7 +160,7 @@ class Game {
       this.nextPlayer()
 
       if (this.isGameOver()) {
-        this.broadcastMsg('gameOver')
+        this.changeGameStatus(true)
       }
     } else {
       this.sendMsg(uid, 'message', {
@@ -166,15 +169,13 @@ class Game {
       })
     }
   }
+  changeGameStatus (status) {
+    this.gameStatus = status
+    this.broadcastMsg('gameOver', status)
+  }
   skip (uid) {
     if (!this.isInRoom(uid)) return
     this.skipNum += 1
-    if (this.skipNum === this.members.length) {
-      this.outCards = [...this.outCards, this.currentCards]
-      this.currentCards = []
-      this.broadcastCurrentCards()
-      this.fillCards()
-    }
     this.nextPlayer()
   }
   broadcastCurrentPlayer () {
@@ -215,19 +216,20 @@ class Game {
   }
   nextPlayer () {
     let currentPlayerIndex = this.currentPlayerIndex
-    let currentPlayer = this.currentPlayer
-    let circleNum = 1
-    do {
-      circleNum += 1
-      if (circleNum > 2) {
-        this.skipNum += 1
+    this.currentPlayerIndex = (currentPlayerIndex + 1) % this.membersLength
+    this.currentPlayer = this.members[this.currentPlayerIndex]
+    if (this.handCards[this.currentPlayer].length === 0) {
+      this.skipNum += 1
+      this.nextPlayer()
+    } else {
+      if (this.skipNum === this.membersLength) {
+        this.outCards = [...this.outCards, this.currentCards]
+        this.currentCards = []
+        this.broadcastCurrentCards()
+        this.fillCards()
       }
-      currentPlayerIndex = (currentPlayerIndex + 1) % this.membersLength
-      currentPlayer = this.members[currentPlayerIndex]
-    } while (this.handCards[currentPlayer].length === 0)
-    this.currentPlayer = currentPlayer
-    this.currentPlayerIndex = currentPlayerIndex
-    this.broadcastCurrentPlayer()
+      this.broadcastCurrentPlayer()
+    }
   }
   isInRoom (uid) {
     return this.members.includes(uid)
@@ -237,7 +239,7 @@ class Game {
     this.members.forEach(uid => {
       if (this.handCards[uid].length === 0)emptyNum += 1
     })
-    if (emptyNum >= this.membersLength - 1) return true
+    if (emptyNum >= this.membersLength - 1 && this.cards.length === 0) return true
     return false
   }
   playRules (cards) {

@@ -16,7 +16,7 @@ app.get('/api/room/all', (req, res) => {
     name: DATA.rooms[roomId].name,
     members: DATA.rooms[roomId].members,
     roomId,
-    isStart: DATA.rooms[roomId].isStart
+    isStart: DATA.rooms[roomId].god ? DATA.rooms[roomId].god.gameStatus : false
   })))
 })
 app.get('/api/room/add', (req, res) => {
@@ -99,15 +99,7 @@ io.on('connection', socket => {
     }
     socket.join(roomId)
     DATA.rooms[roomId].members.push(uid)
-    if (DATA.persons[uid]) {
-      DATA.persons[uid].roomId = roomId
-    } else {
-      DATA.persons[uid] = {
-        socketId: '',
-        name,
-        roomId
-      }
-    }
+
     socket.emit('message', {
       type: 'info',
       msg: '加入房间'
@@ -125,7 +117,6 @@ io.on('connection', socket => {
     }
     socket.leave(roomId)
     DATA.rooms[roomId].god && DATA.rooms[roomId].god.end()
-    DATA.rooms[roomId].isStart = false
     let members = DATA.rooms[roomId].members.filter(id => id !== uid)
 
     DATA.rooms[roomId].members = members
@@ -144,7 +135,6 @@ io.on('connection', socket => {
   socket.on('startGame', data => {
     let {uid, name, roomId} = data
     DATA.rooms[roomId].god = new Game(roomId, DATA.rooms[roomId], DATA.persons, io)
-    DATA.rooms[roomId].isStart = true
 
     DATA.rooms[roomId].god.start()
   })
