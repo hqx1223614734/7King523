@@ -218,7 +218,7 @@ class Game {
     let currentPlayerIndex = this.currentPlayerIndex
     this.currentPlayerIndex = (currentPlayerIndex + 1) % this.membersLength
     this.currentPlayer = this.members[this.currentPlayerIndex]
-    if (this.handCards[this.currentPlayer].length === 0) {
+    if (this.handCards[this.currentPlayer].length === 0 && this.cards.length === 0) {
       this.skipNum += 1
       this.nextPlayer()
     } else {
