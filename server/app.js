@@ -16,7 +16,7 @@ app.get('/api/room/all', (req, res) => {
     name: DATA.rooms[roomId].name,
     members: DATA.rooms[roomId].members,
     roomId,
-    isStart: DATA.rooms[roomId].god ? DATA.rooms[roomId].god.gameStatus : false
+    isStart: DATA.rooms[roomId].god ? !DATA.rooms[roomId].god.getGameStatus() : false
   })))
 })
 app.get('/api/room/add', (req, res) => {
@@ -60,7 +60,7 @@ io.on('connection', socket => {
       return
     }
     const members = DATA.rooms[roomId].members
-    if (DATA.rooms[roomId].isStart) {
+    if (DATA.rooms[roomId].god && !DATA.rooms[roomId].god.getGameStatus()) {
       socket.emit('message', {
         type: 'error',
         msg: '房间已开始游戏'

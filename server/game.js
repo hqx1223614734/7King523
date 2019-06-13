@@ -173,6 +173,9 @@ class Game {
     this.gameStatus = status
     this.broadcastMsg('gameOver', status)
   }
+  getGameStatus () {
+    return this.gameStatus
+  }
   skip (uid) {
     if (!this.isInRoom(uid)) return
     this.skipNum += 1
