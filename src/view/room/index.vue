@@ -5,18 +5,30 @@
         v-for="room in rooms"
         :key="room.roomId"
         class="room"
-        :style="{backgroundColor: (room.members.length === 4 || room.isStart) ? 'red' : 'skyblue'}"
-        @click="handleJoin(room.roomId)"
-      >{{room.name}}</div>
-      <div class="room" @click="nameModal = true" style="background-color:skyblue">
+        :style="{backgroundColor: room.isStart ? 'red' : 'skyblue'}"
+        @click="handleJoin(room.isStart, room.roomId, room.type)"
+      >
+        <div class="room-msg">
+          <p class="room-name">{{room.name}}</p>
+          <p class="game-name">{{gameTypeMap[room.type] && gameTypeMap[room.type].name}}</p>
+        </div>
+      </div>
+      <div class="room-tool" @click="nameModal = true" style="background-color:skyblue">
         <Icon type="md-add" size="large"/>
       </div>
-      <div class="room" @click="getRooms()" style="background-color:skyblue">
+      <div class="room-tool" @click="getRooms()" style="background-color:skyblue">
         <Icon type="md-refresh" size="large"/>
       </div>
     </div>
     <Modal v-model="nameModal" width="360" :mask-closable="false">
       <p slot="header" style="color:#f60;text-align:center">请输入房间名</p>
+      <div class="game-type">
+        <RadioGroup v-model="gameType" vertical>
+          <Radio v-for="item in gameTypeList" :key="item.type" :label="item.type">
+            <span>{{item.name}}</span>
+          </Radio>
+        </RadioGroup>
+      </div>
       <div style="text-align:center">
         <Input v-model="roomName"/>
       </div>
@@ -37,20 +49,32 @@ export default {
     return {
       rooms: [],
       nameModal: false,
-      roomName: ''
+      roomName: '',
+      gameTypeList: [],
+      gameType: ''
     }
   },
   created () {},
   mounted () {
+    this.getGameType()
     this.getRooms()
   },
   methods: {
+    async getGameType () {
+      const result = await API.gameType()
+      this.gameTypeList = result
+      this.gameType = result[0].type
+    },
     async getRooms () {
       const result = await API.getRooms()
       this.rooms = result
     },
-    async handleJoin (roomId) {
-      this.$router.push({name: 'Game', query: {roomId}})
+    async handleJoin (isStart, roomId, type) {
+      if (isStart) {
+        this.$Message.info('该房间已开始游戏')
+      } else {
+        this.$router.push({name: type, query: {roomId}})
+      }
     },
     async handleAdd () {
       const name = this.roomName.trim()
@@ -60,7 +84,8 @@ export default {
         const userMsg = UCommon.getUserMsg()
         const result = await API.addRooms({
           ...userMsg,
-          roomName: name
+          roomName: name,
+          type: this.gameType
         })
         if (result.done) {
           this.$Message.info('添加成功')
@@ -73,6 +98,13 @@ export default {
     }
   },
   computed: {
+    gameTypeMap () {
+      let map = {}
+      this.gameTypeList.forEach(item => {
+        map[item.type] = item
+      })
+      return map
+    }
   }
 }
 </script>
@@ -85,15 +117,46 @@ export default {
   align-items: center;
   flex-wrap: wrap;
 }
-.room {
+.room-tool {
+  position: relative;
   width: 100px;
   height: 100px;
   margin-left: 10px;
   margin-top: 10px;
   border-radius: 5px;
   cursor: pointer;
+  color: blue;
   text-align: center;
   line-height: 100px;
+}
+
+.room {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin-left: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  cursor: pointer;
   color: blue;
+}
+.room-msg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.room-name {
+  font-size: 20px;
+}
+.game-name {
+  color: black;
+  font-size: 12px;
 }
 </style>

@@ -110,7 +110,6 @@
   </div>
 </template>
 <script>
-import API from '@/api/'
 import UCommon from '@/util/common'
 import io from 'socket.io-client'
 export default {
@@ -232,6 +231,7 @@ export default {
       this.server.emit('skip', {roomId, uid})
     },
     async handleLeave () {
+      this.server.close()
       const userMsg = this.userMsg
       this.server.emit('leaveRooms', {
         uid: userMsg.uid,
@@ -260,20 +260,6 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
-}
-.currentPlayer {
-  animation: Twinkle 2s ease infinite;
-}
-@keyframes Twinkle {
-  0% {
-    background-color: rgba(100, 155, 140, 1);
-  }
-  50% {
-    background-color: rgba(120, 120, 255, 1);
-  }
-  100% {
-    background-color: rgba(100, 155, 140, 1);
-  }
 }
 </style>
 

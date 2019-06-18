@@ -57,7 +57,7 @@ const VALUE = [
     value: 13
   }
 ]
-class Game {
+class King523 {
   constructor (roomId, room, persons, io) {
     this.roomId = roomId
     this.members = room.members
@@ -276,4 +276,4 @@ class Game {
     this.io.in(this.roomId).emit(event, msg)
   }
 }
-module.exports = Game
+module.exports = King523
