@@ -224,15 +224,15 @@ class King523 {
     if (this.handCards[this.currentPlayer].length === 0 && this.cards.length === 0) {
       this.skipNum += 1
       this.nextPlayer()
-    } else {
-      if (this.skipNum === this.membersLength) {
-        this.outCards = [...this.outCards, this.currentCards]
-        this.currentCards = []
-        this.broadcastCurrentCards()
-        this.fillCards()
-      }
-      this.broadcastCurrentPlayer()
+      return
     }
+    if (this.skipNum === this.membersLength) {
+      this.outCards = [...this.outCards, this.currentCards]
+      this.currentCards = []
+      this.broadcastCurrentCards()
+      this.fillCards()
+    }
+    this.broadcastCurrentPlayer()
   }
   isInRoom (uid) {
     return this.members.includes(uid)
