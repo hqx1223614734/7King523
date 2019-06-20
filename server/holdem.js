@@ -2,55 +2,55 @@ const COLOR = ['♥', '♠', '♦', '♣']
 const VALUE = [
   {
     label: 'A',
-    value: 14
+    value: 40.96
   },
   {
     label: '2',
-    value: 2
+    value: 0.01
   },
   {
     label: '3',
-    value: 3
+    value: 0.02
   },
   {
     label: '4',
-    value: 4
+    value: 0.04
   },
   {
     label: '5',
-    value: 4
+    value: 0.08
   },
   {
     label: '6',
-    value: 6
+    value: 0.16
   },
   {
     label: '7',
-    value: 7
+    value: 0.32
   },
   {
     label: '8',
-    value: 8
+    value: 0.64
   },
   {
     label: '9',
-    value: 9
+    value: 1.28
   },
   {
     label: '10',
-    value: 10
+    value: 2.56
   },
   {
     label: 'J',
-    value: 11
+    value: 5.12
   },
   {
     label: 'Q',
-    value: 12
+    value: 10.24
   },
   {
     label: 'K',
-    value: 13
+    value: 20.48
   }
 ]
 class Holdem {
@@ -307,43 +307,14 @@ function getWin (members, playerData, tableCards) {
   }))
   return scores.sort((a, b) => b.score - a.score)
 }
-// let c1 = [
-//   {
-//     color: '♥',
-//     value: 14
-//   },
-//   {
-//     color: '♥',
-//     value: 13
-//   },
-//   {
-//     color: '♥',
-//     value: 12
-//   },
-//   {
-//     color: '♦',
-//     value: 14
-//   },
-//   {
-//     color: '♠',
-//     value: 14
-//   },
-//   {
-//     color: '♥',
-//     value: 11
-//   },
-//   {
-//     color: '♦',
-//     value: 10
-//   }
-// ]
-// let c2 = [ { color: '♦', value: 14 },
-//   { color: '♠', value: 14 },
-//   { color: '♥', value: 12 },
-//   { color: '♥', value: 11 },
-//   { color: '♥', value: 10 } ]
-// console.log(compute(c2))
 
+const c = [{color: '♣', value: 0.04}, {color: '♠', value: 0.02}, {color: '♥', value: 2.56}, {color: '♦', value: 0.32}, {color: '♦', value: 1.28}]
+const c1 = [{color: '♦', value: 10.24}, {color: '♠', value: 0.04}]
+const c2 = [{color: '♣', value: 0.02}, {color: '♥', value: 10.24}]
+const c3 = [{color: '♣', value: 2.56}, {color: '♥', value: 5.12}]
+console.log(getScore([...c, ...c1]), 'c1')
+console.log(getScore([...c, ...c2]), 'c2')
+console.log(getScore([...c, ...c3]), 'c3')
 function getScore (cards7) {
   cards7.sort((a, b) => b.value - a.value)
   let score = -1
@@ -358,53 +329,53 @@ function getScore (cards7) {
 }
 function compute (cards5) {
   if (isColorFlush(cards5)) {
-    return 10000000
+    return 2000000 + cards5[0].value
   }
   if (isColor(cards5)) {
-    return 8000000
+    return 1900000
   }
   if (isFlush(cards5)) {
-    return 6000000 + cards5.reduce((sum, card) => sum + card.value, 0)
+    return 1800000 + cards5[0].value
   }
   // 判断41
   if (cards5[0].value === cards5[1].value && cards5[0].value === cards5[2].value && cards5[0].value === cards5[3].value) {
-    return cards5[0].value * 500000
+    return cards5[0].value + 1700000
   } else if (cards5[1].value === cards5[2].value && cards5[1].value === cards5[3].value && cards5[1].value === cards5[4].value) {
-    return cards5[1].value * 500000
+    return cards5[1].value + 1700000
   }
   // 判断32
   if (cards5[0].value === cards5[1].value && cards5[0].value === cards5[2].value && cards5[3].value === cards5[4].value) {
-    return cards5[0].value * 60000
+    return cards5[0].value + 1600000
   } else if (cards5[2].value === cards5[3].value && cards5[2].value === cards5[4].value && cards5[0].value === cards5[1].value) {
-    return cards5[2].value * 60000
+    return cards5[2].value + 1600000
   }
   // 判断 311
   if (cards5[0].value === cards5[1].value && cards5[0].value === cards5[2].value) {
-    return cards5[0].value * 7000 + 16000
+    return cards5[0].value + 1500000
   } else if (cards5[2].value === cards5[3].value && cards5[2].value === cards5[4].value) {
-    return cards5[2].value * 7000 + 16000
+    return cards5[2].value + 1500000
   } else if (cards5[1].value === cards5[2].value && cards5[1].value === cards5[3].value) {
-    return cards5[1].value * 7000 + 16000
+    return cards5[1].value + 1500000
   }
   // 判断221
   if (cards5[0].value === cards5[1].value && cards5[2].value === cards5[3].value) {
-    return Math.pow(2, cards5[0].value) + Math.pow(2, cards5[2].value) + cards5[4].value / 4 + 2000
+    return cards5[0].value * 10000 + cards5[2].value * 10000 + cards5[4].value + 500000
   } else if (cards5[0].value === cards5[1].value && cards5[3].value === cards5[4].value) {
-    return Math.pow(2, cards5[0].value) + Math.pow(2, cards5[3].value) + cards5[2].value / 4 + 2000
+    return cards5[0].value * 10000 + cards5[2].value + cards5[3].value * 10000 + 500000
   } else if (cards5[1].value === cards5[2].value && cards5[3].value === cards5[4].value) {
-    return Math.pow(2, cards5[1].value) + Math.pow(2, cards5[3].value) + cards5[0].value / 4 + 2000
+    return cards5[0].value + cards5[1].value * 10000 + cards5[3].value * 10000 + 500000
   }
 
   // 判断2111
   let sum = cards5.reduce((sum, card) => sum + card.value, 0)
   if (cards5[0].value === cards5[1].value) {
-    return sum + cards5[0].value * 100
+    return cards5[0].value * 9998 + sum
   } else if (cards5[1].value === cards5[2].value) {
-    return sum + cards5[1].value * 100
+    return cards5[1].value * 9998 + sum
   } else if (cards5[2].value === cards5[3].value) {
-    return sum + cards5[2].value * 100
+    return cards5[2].value * 9998 + sum
   } else if (cards5[3].value === cards5[4].value) {
-    return sum + cards5[3].value * 100
+    return cards5[3].value * 9998 + sum
   }
   // 判断11111
   return sum
@@ -416,6 +387,6 @@ function isColor (cards) {
   return (cards[0].color === cards[1].color && cards[0].color === cards[2].color && cards[0].color === cards[3].color && cards[0].color === cards[4].color)
 }
 function isFlush (cards) {
-  return (cards[0].value === cards[1].value + 1 && cards[0].value === cards[2].value + 2 && cards[0].value === cards[3].value + 3 && cards[0].value === cards[4].value + 4)
+  return (cards[0].value === cards[1].value * 2 && cards[1].value === cards[2].value * 2 && cards[2].value === cards[3].value * 2 && cards[3].value === cards[4].value * 2)
 }
 module.exports = Holdem
