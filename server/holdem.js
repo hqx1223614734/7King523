@@ -194,7 +194,11 @@ class Holdem {
       this.sendMsg(this.room.uid, 'nextRound')
       return
     }
-    this.nextPlayer()
+    if (this.shouldCutCards()) {
+      this.cutCards()
+    } else {
+      this.nextPlayer()
+    }
     this.broadcastPlayerData()
   }
   settlement (uids) {
@@ -231,40 +235,7 @@ class Holdem {
         this.skpiNum += 1
       }
       if (bets !== 0 || this.skpiNum >= this.membersLength) {
-        let length = this.playerData.currentCards.length
-        if (length === 0) {
-          this.playerData.currentCards = [...this.cards.splice(0, 3)]
-        } else if (length >= 5) {
-          const sortScore = getWin(this.members, this.playerData, this.playerData.currentCards)
-          const sortWinners = sortScore.map(score => ({
-            uid: score.uid,
-            score: score.score,
-            name: this.persons[score.uid].name,
-            handCards: this.playerData[score.uid].handCards
-          }))
-          let winners = []
-          sortScore.forEach(s => {
-            if (winners.length === 0 || winners[0].score === s.score) {
-              winners.push(s)
-            } else if (winners[0].score < s.score) {
-              winners = [s]
-            }
-          })
-          this.settlement(winners.map(win => win.uid))
-          const winnerNames = winners.map(win => this.persons[win.uid].name)
-          this.playerData.sortWinners = sortWinners
-          this.playerData.winnerNames = winnerNames
-          this.broadcastPlayerData()
-          this.sendMsg(this.room.uid, 'nextRound')
-          return
-        } else {
-          this.playerData.currentCards.push(this.cards.shift())
-        }
-        this.playerData.currentPlayer = this.playerData.smallB
-        this.playerData.currentPlayerIndex = this.playerData.smallBIndex
-        if (this.playerData[this.playerData.currentPlayer].isDiscard) {
-          this.nextPlayer()
-        }
+        this.cutCards()
         this.skpiNum = 0
       } else {
         this.nextPlayer()
@@ -274,6 +245,41 @@ class Holdem {
     }
     this.broadcastPlayerData()
     this.stepNum += 1
+  }
+  cutCards () {
+    let length = this.playerData.currentCards.length
+    if (length === 0) {
+      this.playerData.currentCards = [...this.cards.splice(0, 3)]
+    } else if (length >= 5) {
+      const sortScore = getWin(this.members.filter(uid => !this.playerData[uid].isDiscard), this.playerData, this.playerData.currentCards)
+      const sortWinners = sortScore.map(score => ({
+        uid: score.uid,
+        score: score.score,
+        name: this.persons[score.uid].name,
+        handCards: this.playerData[score.uid].handCards
+      }))
+      let winners = []
+      sortScore.forEach(s => {
+        if (winners.length === 0 || winners[0].score === s.score) {
+          winners.push(s)
+        } else if (winners[0].score < s.score) {
+          winners = [s]
+        }
+      })
+      this.settlement(winners.map(win => win.uid))
+      const winnerNames = winners.map(win => this.persons[win.uid].name)
+      this.playerData.sortWinners = sortWinners
+      this.playerData.winnerNames = winnerNames
+      this.broadcastPlayerData()
+      this.sendMsg(this.room.uid, 'nextRound')
+    } else {
+      this.playerData.currentCards.push(this.cards.shift())
+    }
+    this.playerData.currentPlayer = this.playerData.smallB
+    this.playerData.currentPlayerIndex = this.playerData.smallBIndex
+    if (this.playerData[this.playerData.currentPlayer].isDiscard) {
+      this.nextPlayer()
+    }
   }
   getMaxBets () {
     return this.members.filter(uid => !this.playerData[uid].isDiscard).map(uid => this.playerData[uid].bets).reduce((sum, value) => sum > value ? sum : value, -1)
@@ -308,13 +314,10 @@ function getWin (members, playerData, tableCards) {
   return scores.sort((a, b) => b.score - a.score)
 }
 
-const c = [{color: '♣', value: 0.04}, {color: '♠', value: 0.02}, {color: '♥', value: 2.56}, {color: '♦', value: 0.32}, {color: '♦', value: 1.28}]
-const c1 = [{color: '♦', value: 10.24}, {color: '♠', value: 0.04}]
-const c2 = [{color: '♣', value: 0.02}, {color: '♥', value: 10.24}]
-const c3 = [{color: '♣', value: 2.56}, {color: '♥', value: 5.12}]
-console.log(getScore([...c, ...c1]), 'c1')
-console.log(getScore([...c, ...c2]), 'c2')
-console.log(getScore([...c, ...c3]), 'c3')
+// const c = [{color: '♣', value: 0.04}, {color: '♠', value: 0.02}, {color: '♥', value: 2.56}, {color: '♦', value: 0.32}, {color: '♦', value: 1.28}]
+// const c1 = [{color: '♦', value: 10.24}, {color: '♠', value: 0.04}]
+// const c2 = [{color: '♣', value: 0.02}, {color: '♥', value: 10.24}]
+// const c3 = [{color: '♣', value: 2.56}, {color: '♥', value: 5.12}]
 function getScore (cards7) {
   cards7.sort((a, b) => b.value - a.value)
   let score = -1
@@ -332,7 +335,7 @@ function compute (cards5) {
     return 2000000 + cards5[0].value
   }
   if (isColor(cards5)) {
-    return 1900000
+    return 1900000 + cards5[0].value
   }
   if (isFlush(cards5)) {
     return 1800000 + cards5[0].value
