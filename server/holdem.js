@@ -145,6 +145,7 @@ class Holdem {
     this.stepNum = 1
     this.skpiNum = 0
     this.discardNum = 0
+    this.betsNum = 0
   }
   nextRound () {
     const smallB = this.playerData.bigB
@@ -169,7 +170,12 @@ class Holdem {
     this.playerData.currentPlayer = this.members[this.playerData.currentPlayerIndex]
     if (this.playerData[this.playerData.currentPlayer].isDiscard) {
       this.skpiNum += 1
-      this.nextPlayer()
+      if (this.skpiNum >= this.membersLength) {
+        this.cutCards()
+        this.skpiNum = 0
+      } else {
+        this.nextPlayer()
+      }
     }
   }
   end () {
@@ -194,7 +200,7 @@ class Holdem {
       this.sendMsg(this.room.uid, 'nextRound')
       return
     }
-    if (this.shouldCutCards()) {
+    if (this.shouldCutCards() && this.betsNum !== 0) {
       this.cutCards()
     } else {
       this.nextPlayer()
@@ -236,7 +242,6 @@ class Holdem {
       }
       if (bets !== 0 || this.skpiNum >= this.membersLength) {
         this.cutCards()
-        this.skpiNum = 0
       } else {
         this.nextPlayer()
       }
@@ -245,6 +250,9 @@ class Holdem {
     }
     this.broadcastPlayerData()
     this.stepNum += 1
+    if (bets !== 0) {
+      this.betsNum += 1
+    }
   }
   cutCards () {
     let length = this.playerData.currentCards.length
@@ -252,7 +260,8 @@ class Holdem {
       this.playerData.currentCards = [...this.cards.splice(0, 3)]
     } else if (length >= 5) {
       const sortScore = getWin(this.members.filter(uid => !this.playerData[uid].isDiscard), this.playerData, this.playerData.currentCards)
-      const sortWinners = sortScore.map(score => ({
+      const discardScre = getWin(this.members.filter(uid => this.playerData[uid].isDiscard), this.playerData, this.playerData.currentCards)
+      const sortWinners = [...sortScore, ...discardScre].map(score => ({
         uid: score.uid,
         score: score.score,
         name: this.persons[score.uid].name,
@@ -280,6 +289,8 @@ class Holdem {
     if (this.playerData[this.playerData.currentPlayer].isDiscard) {
       this.nextPlayer()
     }
+    this.betsNum = 0
+    this.skpiNum = 0
   }
   getMaxBets () {
     return this.members.filter(uid => !this.playerData[uid].isDiscard).map(uid => this.playerData[uid].bets).reduce((sum, value) => sum > value ? sum : value, -1)
@@ -293,6 +304,7 @@ class Holdem {
     return result
   }
   changeGameStatus (status) {
+    if (this.gameStatus === status) return
     this.gameStatus = status
     this.broadcastMsg('gameOver', status)
   }
