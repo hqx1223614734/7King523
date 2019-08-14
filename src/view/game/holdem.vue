@@ -226,7 +226,7 @@ export default {
     initIo () {
       const userMsg = this.userMsg
       if (userMsg === null) return
-      const server = io('http://127.0.0.1:80', {
+      const server = io('http://www.hanqx.xin:80', {
         query: {
           uid: userMsg.uid,
           name: userMsg.name
