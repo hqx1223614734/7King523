@@ -201,7 +201,7 @@ io.on('connection', socket => {
     io.sockets.in(roomId).emit('updateRoomMembers', DATA.rooms[roomId].members.map(uid => ({uid, name: DATA.persons[uid].name})))
   })
 })
-server.listen(3000)
+server.listen(80)
 console.log('服务器运行在3000端口')
 
 /** rooms

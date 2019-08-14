@@ -226,7 +226,7 @@ export default {
     initIo () {
       const userMsg = this.userMsg
       if (userMsg === null) return
-      const server = io('http://140.143.141.240:3000', {
+      const server = io('http://127.0.0.1:80', {
         query: {
           uid: userMsg.uid,
           name: userMsg.name
