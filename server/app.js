@@ -4,9 +4,10 @@ const express = require('express')
 const app = express()
 const King523 = require('./7king523')
 const Holdem = require('./holdem')
+const appConfig = require('./configs/app')
 
-// -------------配置数据--------------
-const PORT = 3080
+// 配置数据
+const {port} = appConfig
 // -------------公共数据--------------
 const DATA = {
   rooms: [],
@@ -208,8 +209,8 @@ io.on('connection', socket => {
     io.sockets.in(roomId).emit('updateRoomMembers', DATA.rooms[roomId].members.map(uid => ({uid, name: DATA.persons[uid].name})))
   })
 })
-server.listen(PORT, function () {
-  console.log(`服务器运行在${PORT}端口`)
+server.listen(port, function () {
+  console.log(`服务器运行在${port}端口`)
 })
 
 /** rooms
