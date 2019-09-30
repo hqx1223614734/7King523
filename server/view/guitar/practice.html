@@ -86,7 +86,7 @@
                 <option value="low">低</option>
             </select>
             <select name="" id="sing">
-                <option value="=do">do</option>
+                <option value="do">do</option>
                 <option value="re">re</option>
                 <option value="mi">mi</option>
                 <option value="fa">fa</option>
@@ -239,12 +239,14 @@
 
         // default调试用
         let defaultTopic = {
-            type: 1,
+            type: 2,
             music_level: 'low',
             sing: 're',
-            title: '低音re'
+            xian: '5',
+            pin: '3',
+            title: '5弦3品'
         }
-        nextTopic()
+        nextTopic(defaultTopic)
 
         // 监听函数
         function onOk() {
