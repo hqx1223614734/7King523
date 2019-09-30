@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>practice</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+        }
+
+        .topic {
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        #msg {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            margin: auto;
+            width: 70%;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            border-radius: 5px;
+            transition: .3s;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
+        }
+
+        .msg-error {
+            color: red;
+        }
+
+        .msg-success {
+            color: lightgreen;
+        }
+
+        .msg-info {
+            color: yellowgreen;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .opacity-1 {
+            opacity: 1;
+        }
+
+        .opacity-0 {
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="opacity-0" id="msg"></div>
+    <div class="topic">
+        <p id="title">这里是title</p>
+        <div id="answer1">
+            <select name="" id="xian">
+                <option value="1">1弦</option>
+                <option value="2">2弦</option>
+                <option value="3">3弦</option>
+                <option value="4">4弦</option>
+                <option value="5">5弦</option>
+                <option value="6">6弦</option>
+            </select>
+            <select name="" id="pin">
+                <option value="0">0品</option>
+                <option value="1">1品</option>
+                <option value="2">2品</option>
+                <option value="3">3品</option>
+            </select>
+        </div>
+        <div id="answer2">
+            <select name="" id="music_level">
+                <option value="high">高</option>
+                <option value="middle">中</option>
+                <option value="low">低</option>
+            </select>
+            <select name="" id="sing">
+                <option value="=do">do</option>
+                <option value="re">re</option>
+                <option value="mi">mi</option>
+                <option value="fa">fa</option>
+                <option value="sol">sol</option>
+                <option value="la">la</option>
+                <option value="si">si</option>
+            </select>
+        </div>
+        <div style="margin-top:10px;">
+            <input type="button" onclick="onOk()" value="看看对不">
+            <input type="button" onclick="onError()" value="给的啥玩意"">
+        </div>
+    </div>
+    <script>
+        // dom节点
+        const dom_title = document.querySelector('#title')
+        const dom_xian = document.querySelector('#xian')
+        const dom_pin = document.querySelector('#pin')
+        const dom_music_level = document.querySelector('#music_level')
+        const dom_sing = document.querySelector('#sing')
+        const dom_msg = document.querySelector('#msg')
+        const dom_answer1 = document.querySelector('#answer1')
+        const dom_answer2 = document.querySelector('#answer2')
+        // 基础数据
+        const map = {
+            1: {
+                sing: 'do',
+                name: 'C',
+                high: {
+                    pin: '1',
+                    xian: '2'
+                },
+                middle: {
+                    pin: '3',
+                    xian: '5'
+                },
+                low: {
+                    pin: '-1',
+                    xian: '-1'
+                }
+            },
+            2: {
+                sing: 're',
+                name: 'D',
+                high: {
+                    pin: '3',
+                    xian: '2'
+                },
+                middle: {
+                    pin: '0',
+                    xian: '4'
+                },
+                low: {
+                    pin: '-1',
+                    xian: '-1'
+                }
+            },
+            3: {
+                sing: 'mi',
+                name: 'E',
+                high: {
+                    pin: '0',
+                    xian: '1'
+                },
+                middle: {
+                    pin: '2',
+                    xian: '4'
+                },
+                low: {
+                    pin: '0',
+                    xian: '6'
+                }
+            },
+            4: {
+                sing: 'fa',
+                name: 'F',
+                high: {
+                    pin: '1',
+                    xian: '1'
+                },
+                middle: {
+                    pin: '3',
+                    xian: '4'
+                },
+                low: {
+                    pin: '1',
+                    xian: '6'
+                }
+            },
+            5: {
+                sing: 'sol',
+                name: 'G',
+                high: {
+                    pin: '3',
+                    xian: '1'
+                },
+                middle: {
+                    pin: '0',
+                    xian: '3'
+                },
+                low: {
+                    pin: '3',
+                    xian: '6'
+                }
+            },
+            6: {
+                sing: 'la',
+                name: 'A',
+                high: {
+                    pin: '-1',
+                    xian: '-1'
+                },
+                middle: {
+                    pin: '2',
+                    xian: '3'
+                },
+                low: {
+                    pin: '0',
+                    xian: '5'
+                }
+            },
+            7: {
+                sing: 'si',
+                name: 'B',
+                high: {
+                    pin: '-1',
+                    xian: '-1'
+                },
+                middle: {
+                    pin: '0',
+                    xian: '2'
+                },
+                low: {
+                    pin: '2',
+                    xian: '5'
+                }
+            }
+        }
+        const sings = Object.values(map).map(item => item.sing)
+        const names = Object.values(map).map(item => item.name)
+        const music_levels = ['high', 'middle', 'low']
+        const music_level_name = {
+            high: '高',
+            middle: '中',
+            low: '低'
+        }
+        const pins = [1, 2, 3, 0].map(item => item + '')
+        const xians = [1, 2, 3, 4, 5, 6].map(item => item + '')
+
+        const topics = [
+            {
+                title: '',
+                music_level: '',
+                sing: '',
+                type: 1,
+            },
+            {
+                title: '',
+                pin: '',
+                xian: '',
+                type: 2
+            }
+        ]
+
+        let currentTopic = {}
+
+        // default调试用
+        // let defaultTopic = {
+        //     type: 2,
+        //     pin: '0',
+        //     xian: '3',
+        //     title: '3弦0品'
+        // }
+        nextTopic()
+
+        // 监听函数
+        function onOk() {
+            let { pin, xian, music_level, sing } = getAnswer()
+            const topicType = currentTopic.type
+            if (topicType === 1) {
+                const { music_level, sing } = currentTopic
+                const { pin: _pin, xian: _xian } = Object.values(map).filter(item => item.sing === sing)[0][music_level]
+                handleAnswer(pin, _pin, xian, _xian)
+            } else if (topicType === 2) {
+                const { pin, xian } = currentTopic
+                const { pin: _pin, xian: _xian } = Object.values(map).filter(item => item.sing === sing)[0][music_level]
+                handleAnswer(pin, _pin, xian, _xian)
+            }
+        }
+        function onError() {
+            const topicType = currentTopic.type
+            let status = false
+            if (topicType === 1) {
+                const { music_level, sing } = currentTopic
+                status = Object.values(map).filter(item => item.sing === sing).length === 0
+            } else if (topicType === 2) {
+                const { pin, xian } = currentTopic
+                status = Object.values(map).filter(item => music_levels.reduce((prev, cur) => prev || (isEqual(pin, item[cur].pin, xian, item[cur].xian))), false)
+            } else {
+                showError('wc，第三种情况出现了？')
+            }
+            handleError(status)
+        }
+        // 工具函数
+        function handleError(status) {
+            if (status) {
+                showInfo('sorry 下一道')
+                nextTopic()
+            } else {
+                showInfo('别秀了，好好答题')
+            }
+        }
+        function handleAnswer(pin, _pin, xian, _xian) {
+            if (isEqual(pin, _pin, xian, _xian)) {
+                showSuccess('算你厉害, 下一个')
+                nextTopic()
+            } else {
+                showError('错了')
+            }
+        }
+        function isEqual(pin, _pin, xian, _xian) {
+            return pin === _pin && xian === _xian
+        }
+        function nextTopic(defaultTopic) {
+            if (Math.random() > 0.3) {
+                currentTopic = topics[0]
+                currentTopic.music_level = music_levels[getRandomInteger(0, music_levels.length)]
+                currentTopic.sing = sings[getRandomInteger(0, sings.length)]
+                currentTopic.title = `${music_level_name[currentTopic.music_level]}音${currentTopic.sing}`
+
+                dom_answer1.className = ''
+                dom_answer2.className = 'hidden'
+            } else {
+                currentTopic = topics[1]
+                currentTopic.pin = pins[getRandomInteger(0, pins.length)]
+                currentTopic.xian = xians[getRandomInteger(0, xians.length)]
+                currentTopic.title = `${currentTopic.xian}弦${currentTopic.pin}品`
+
+                dom_answer1.className = 'hidden'
+                dom_answer2.className = ''
+            }
+            if(defaultTopic){
+                currentTopic = dingzhi
+                dom_answer1.className = ''
+                dom_answer2.className = ''
+            }
+            dom_title.innerText = currentTopic.title
+        }
+
+        function getRandomInteger(start, end) {
+            return Math.floor(Math.random() * (end - start) + start)
+        }
+
+        function getAnswer() {
+            const pin = dom_pin.value
+            const xian = dom_xian.value
+            const music_level = dom_music_level.value
+            const sing = dom_sing.value
+            return {
+                sing,
+                xian,
+                music_level,
+                pin
+            }
+        }
+
+        function showError(msg) {
+            showMessage(msg, 'error')
+        }
+
+        function showInfo(msg) {
+            showMessage(msg, 'info')
+        }
+
+        function showSuccess(msg) {
+            showMessage(msg, 'success')
+        }
+
+        let timer = 0
+        function showMessage(msg, type, timeout = 1500) {
+            dom_msg.className = 'opacity-1 msg-' + type
+            dom_msg.innerText = msg
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+                dom_msg.className = 'opacity-0'
+            }, timeout)
+        }
+    </script>
+</body>
+
+</html>

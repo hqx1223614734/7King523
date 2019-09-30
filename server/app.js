@@ -4,6 +4,9 @@ const express = require('express')
 const app = express()
 const King523 = require('./7king523')
 const Holdem = require('./holdem')
+
+// -------------配置数据--------------
+const PORT = 3080
 // -------------公共数据--------------
 const DATA = {
   rooms: [],
@@ -29,6 +32,10 @@ function getGame (type) {
 }
 // -------------路由接口-------------
 app.use(express.static(path.join(__dirname, './public')))
+
+app.get('/guitar/practice', (req, res) => {
+  res.sendFile(path.join(__dirname, './view/guitar/practice.html'))
+})
 
 app.get('/api/room/all', (req, res) => {
   res.send(Object.keys(DATA.rooms).map(roomId => ({
@@ -201,8 +208,9 @@ io.on('connection', socket => {
     io.sockets.in(roomId).emit('updateRoomMembers', DATA.rooms[roomId].members.map(uid => ({uid, name: DATA.persons[uid].name})))
   })
 })
-server.listen(80)
-console.log('服务器运行在3000端口')
+server.listen(PORT, function () {
+  console.log(`服务器运行在${PORT}端口`)
+})
 
 /** rooms
  * rooms: {

@@ -9,7 +9,8 @@
     "start": "npm run dev",
     "lint": "eslint --ext .js,.vue src",
     "build": "node build/build.js",
-    "server-dev": "supervisor server/app.js"
+    "server-dev": "supervisor server/app.js",
+    "prod": "node server/app.js"
   },
   "dependencies": {
     "axios": "^0.19.0",
